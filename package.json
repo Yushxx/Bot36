@@ -1,0 +1,27 @@
+{
+  "name": "telegram-bot-sequence",
+  "version": "1.0.0",
+  "description": "A Telegram bot to send specific sequences and proofs based on a schedule.",
+  "main": "bot.js",
+  "scripts": {
+    "start": "node bot.js"
+  },
+  "dependencies": {
+    "lodash": "^4.17.21",
+    "node-schedule": "^2.1.1",
+    "node-telegram-bot-api": "^0.61.0"
+  },
+  "devDependencies": {},
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "keywords": [
+    "telegram",
+    "bot",
+    "sequence",
+    "schedule",
+    "signals"
+  ],
+  "author": "Your Name",
+  "license": "MIT"
+}
