@@ -14,8 +14,8 @@ const howToPlayUrlB = process.env.HOW_TO_PLAY_URLB;
 
 // Liste des séquences prédéfinies
 const sequences = {
-    SeqA: { positions: [2, 1, 3, 4], video: 't.me/pvvvvip/1' },
-    SeqB: { positions: [1, 2, 3, 4], video: 't.me/pvvvvip/2' },
+    SeqA: { positions: [2, 1, 3, 4], video: 't.me/pvvvvip/2' },
+    SeqB: { positions: [1, 2, 3, 4], video: 't.me/pvvvvip/11' },
     SeqC: { positions: [1, 3, 3, 2], video: 't.me/pvvvvip/3' },
     SeqD: { positions: [5, 5, 3, 2], video: 't.me/pvvvvip/4' },
     SeqE: { positions: [3, 2, 2, 5], video: 't.me/pvvvvip/5' },
