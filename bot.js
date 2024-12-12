@@ -1,29 +1,22 @@
 const TelegramBot = require('node-telegram-bot-api');
 const schedule = require('node-schedule');
-const http = require('http');
 
-// Charger les variables d'environnement
-require('dotenv').config();
+// Token de votre bot Telegram
+const token = process.env.BOT_TOKEN; // Utilisation de la variable d'environnement pour le token du bot
+const bot = new TelegramBot(token, { polling: true });
 
-// Initialisation du bot
-const bot = new TelegramBot(process.env.BOT_TOKEN, { polling: true });
-const channelId = process.env.CHANNEL_ID; // ID du canal où les messages seront envoyés
-const signupUrl = process.env.SIGNUP_URL;
-const howToPlayUrl = process.env.HOW_TO_PLAY_URL;
-const howToPlayUrlB = process.env.HOW_TO_PLAY_URLB;
-
-// Liste des séquences prédéfinies
+// Liste des séquences prédéfinies avec les positions des pommes
 const sequences = {
-    SeqA: { positions: [2, 1, 3, 4], video: 't.me/pvvvvip/2' },
-    SeqB: { positions: [1, 2, 3, 4], video: 't.me/pvvvvip/11' },
-    SeqC: { positions: [1, 3, 3, 2], video: 't.me/pvvvvip/3' },
-    SeqD: { positions: [5, 5, 3, 2], video: 't.me/pvvvvip/4' },
-    SeqE: { positions: [3, 2, 2, 5], video: 't.me/pvvvvip/5' },
-    SeqF: { positions: [4, 4, 2, 1], video: 't.me/pvvvvip/6' },
-    SeqG: { positions: [3, 3, 3, 3], video: 't.me/pvvvvip/7' },
-    SeqH: { positions: [5, 5, 2, 4], video: 't.me/pvvvvip/8' },
-    SeqI: { positions: [4, 4, 1, 1], video: 't.me/pvvvvip/9' },
-    SeqJ: { positions: [1, 1, 2, 2], video: 't.me/pvvvvip/10' },
+    SeqA: { positions: [2, 1, 3, 4], video: process.env.VIDEO_1 },
+    SeqB: { positions: [1, 2, 3, 4], video: process.env.VIDEO_2 },
+    SeqC: { positions: [1, 3, 3, 2], video: process.env.VIDEO_3 },
+    SeqD: { positions: [5, 5, 3, 2], video: process.env.VIDEO_4 },
+    SeqE: { positions: [3, 2, 2, 5], video: process.env.VIDEO_5 },
+    SeqF: { positions: [4, 4, 2, 1], video: process.env.VIDEO_6 },
+    SeqG: { positions: [3, 3, 3, 3], video: process.env.VIDEO_7 },
+    SeqH: { positions: [5, 5, 2, 4], video: process.env.VIDEO_8 },
+    SeqI: { positions: [4, 4, 1, 1], video: process.env.VIDEO_9 },
+    SeqJ: { positions: [1, 1, 2, 2], video: process.env.VIDEO_10 },
 };
 
 // Fonction pour choisir une séquence aléatoire
@@ -33,14 +26,48 @@ function getRandomSequence() {
     return sequences[randomKey];
 }
 
+// Fonction pour générer la grille de positions des pommes
+function generateAppleGrid(positions) {
+    // Créer une grille vide de 4x5 (4 lignes, 5 colonnes)
+    let grid = [];
+    for (let i = 0; i < 4; i++) {
+        let row = [];
+        for (let j = 0; j < 5; j++) {
+            row.push('🟩');  // Remplir de carrés vides
+        }
+        grid.push(row);
+    }
+
+    // Placer les pommes 🍎 aux positions données
+    positions.forEach((pos) => {
+        const row = Math.floor((pos - 1) / 5);  // Déterminer la ligne (0-3)
+        const col = (pos - 1) % 5;  // Déterminer la colonne (0-4)
+        grid[row][col] = '🍎';  // Placer la pomme à la position
+    });
+
+    // Retourner la grille sous forme de chaîne de caractères
+    return grid.map(row => row.join(' ')).join('\n');
+}
+
+// Fonction pour générer les codes associés à chaque ligne
+function generateCodes() {
+    const codes = [
+        '2.41', '1.93', '1.54', '1.23'
+    ];
+    return codes;
+}
+
 // Fonction pour envoyer une séquence dans le canal
 function sendSequenceToChannel() {
     const sequence = getRandomSequence();
+    const codes = generateCodes();
     const sequenceMessage = `
-🔔 **CONFIRMED ENTRY!**
-🍎 **Apple Sequence**: ${sequence.positions.join(', ')}
-🔐 **Attempts**: 5
-⏰ **Validity**: 5 minutes
+CONFIRMED ENTRY!
+🍎 Apple Sequence: ${sequence.positions.join(', ')}
+🔐 Attempts: 5
+⏰ Validity: 5 minutes
+
+${codes.map((code, index) => `${code}: ${generateAppleGrid(sequence.positions)[index]}`).join('\n')}
 
 🚨 The signal works only on Linebet with promo code PX221 ✅️!
 `;
@@ -48,9 +75,9 @@ function sendSequenceToChannel() {
     const inlineKeyboard = {
         inline_keyboard: [
             [
-                { text: 'Sign up', url: signupUrl },
-                { text: 'How to play', url: howToPlayUrl },
-                { text: 'Tuto Français', url: howToPlayUrlB },
+                { text: 'Sign up', url: process.env.SIGNUP_URL },
+                { text: 'How to play', url: process.env.HOW_TO_PLAY_URL },
+                { text: 'Tuto Français', url: process.env.HOW_TO_PLAY_URLB },
             ],
         ],
     };
@@ -61,11 +88,11 @@ function sendSequenceToChannel() {
         reply_markup: inlineKeyboard,
     };
 
-    bot.sendMessage(channelId, sequenceMessage, options)
+    bot.sendMessage(process.env.CHANNEL_ID, sequenceMessage, options)
         .then(() => {
             // Attendre 3 minutes avant d'envoyer la preuve
             setTimeout(() => {
-                bot.sendVideo(channelId, sequence.video, { caption: '🎥 **Proof of Sequence**' });
+                bot.sendVideo(process.env.CHANNEL_ID, sequence.video, { caption: '🎥 **Proof of Sequence**' });
             }, 3 * 60 * 1000); // 3 minutes
         })
         .catch((err) => console.error('Erreur d\'envoi dans le canal :', err));
@@ -111,9 +138,3 @@ bot.on('callback_query', (query) => {
         bot.answerCallbackQuery(query.id, { text: 'Test envoyé au canal.' });
     }
 });
-
-// Serveur pour éviter l'inactivité
-http.createServer((req, res) => {
-    res.write("I'm alive");
-    res.end();
-}).listen(8080);
