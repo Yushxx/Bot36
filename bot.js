@@ -47,9 +47,10 @@ function generateVisualSequence(positions) {
 
 // Fonction pour envoyer une séquence au canal
 async function sendSequenceToChannel(chatId, sequence) {
-    const visualSequence = generateVisualSequence(sequence.positions);
+    try {
+        const visualSequence = generateVisualSequence(sequence.positions);
 
-    const sequenceMessage = `
+        const sequenceMessage = `
 ${sequenceTemplate}
 ${visualSequence}
 
@@ -59,25 +60,29 @@ ${visualSequence}
 [Tuto en Français](${howToPlayUrl})
 `;
 
-    const inlineKeyboard = {
-        inline_keyboard: [
-            [
-                { text: 'Sign up', url: signupUrl },
-                { text: 'How to play', url: howToPlayUrl }
+        const inlineKeyboard = {
+            inline_keyboard: [
+                [
+                    { text: 'Sign up', url: signupUrl },
+                    { text: 'How to play', url: howToPlayUrl }
+                ]
             ]
-        ]
-    };
+        };
 
-    // Envoyer la séquence
-    await bot.telegram.sendMessage(chatId, sequenceMessage, {
-        reply_markup: inlineKeyboard,
-        parse_mode: "Markdown"
-    });
+        // Envoi de la séquence
+        await bot.telegram.sendMessage(chatId, sequenceMessage, {
+            reply_markup: inlineKeyboard,
+            parse_mode: "Markdown"
+        });
 
-    // Envoyer la vidéo associée après 3 minutes
-    setTimeout(async () => {
-        await bot.telegram.sendVideo(chatId, sequence.video);
-    }, 3 * 60 * 1000);
+        // Envoi de la vidéo après 3 minutes
+        setTimeout(async () => {
+            await bot.telegram.sendVideo(chatId, sequence.video);
+        }, 3 * 60 * 1000);
+
+    } catch (error) {
+        console.error('Erreur lors de l\'envoi de la séquence:', error);
+    }
 }
 
 // Commande manuelle pour envoyer une séquence
@@ -123,8 +128,9 @@ function scheduleSequences() {
         }
 
         const delay = target - now;
+        console.log(`Séquence planifiée pour ${target.toLocaleString()}`);
         setTimeout(async () => {
-            const sequence = sequences[Math.floor(Math.random() * sequences.length)]; // Obtenir une séquence aléatoire
+            const sequence = sequences[Math.floor(Math.random() * sequences.length)]; // Séquence aléatoire
             if (sequence) {
                 await sendSequenceToChannel('-1002275506732', sequence); // Remplacez par l'ID de votre canal
                 scheduleSequences(); // Replanifier après l'exécution
@@ -144,4 +150,8 @@ http.createServer(function (req, res) {
     res.write("I'm alive");
     res.end();
 }).listen(8080);
- 
+
+// Gestion des erreurs globales du bot
+bot.catch((err, ctx) => {
+    console.error('Erreur de bot:', err);
+});
