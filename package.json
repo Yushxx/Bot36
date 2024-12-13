@@ -1,16 +1,20 @@
 {
-  "name": "telegram-bot",
+  "name": "telegram-sequence-bot",
   "version": "1.0.0",
-  "description": "A Telegram bot for sending signals and handling user interactions",
+  "description": "Bot Telegram pour envoyer des séquences personnalisées avec des vidéos.",
   "main": "bot.js",
   "scripts": {
     "start": "node bot.js"
   },
+  "keywords": [
+    "telegram",
+    "bot",
+    "telegraf",
+    "sequence"
+  ],
+  "author": "Fadel",
+  "license": "MIT",
   "dependencies": {
-    "dotenv": "^16.0.0",
-    "node-telegram-bot-api": "^0.61.0",
-    "node-schedule": "^2.1.0"
-  },
-  "author": "",
-  "license": "ISC"
+    "telegraf": "^4.12.3"
+  }
 }
