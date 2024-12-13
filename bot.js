@@ -1,140 +1,139 @@
-const TelegramBot = require('node-telegram-bot-api');
-const schedule = require('node-schedule');
+const { Telegraf } = require('telegraf');
+const bot = new Telegraf('7755510262:AAEV0nemt9tpH7-jKV6XFEHaarnfFVKMA6E'); // Remplacez par le token de votre bot
 
-// Token de votre bot Telegram
-const token = process.env.BOT_TOKEN; // Utilisation de la variable d'environnement pour le token du bot
-const bot = new TelegramBot(token, { polling: true });
+// Liste des séquences et des vidéos associées
+const sequences = [
+    { code: "A", positions: "2.2.1.3", video: "t.me/pvvvvip/2" },
+    { code: "B", positions: "1.2.2.1", video: "t.me/pvvvvip/3" },
+    { code: "C", positions: "4.5.3.3", video: "t.me/pvvvvip/4" },
+    { code: "D", positions: "2.3.3.5", video: "t.me/pvvvvip/5" },
+    { code: "E", positions: "1.1.1.4", video: "t.me/pvvvvip/6" },
+    { code: "F", positions: "3.2.3.2", video: "t.me/pvvvvip/7" },
+    { code: "G", positions: "1.2.3.4", video: "t.me/pvvvvip/8" },
+    { code: "H", positions: "5.5.3.3", video: "t.me/pvvvvip/9" },
+    { code: "I", positions: "1.2.2.1", video: "t.me/pvvvvip/10" },
+    { code: "J", positions: "3.3.2.4", video: "t.me/pvvvvip/11" },
+];
 
-// Liste des séquences prédéfinies avec les positions des pommes
-const sequences = {
-    SeqA: { positions: [2, 1, 3, 4], video: process.env.VIDEO_1 },
-    SeqB: { positions: [1, 2, 3, 4], video: process.env.VIDEO_2 },
-    SeqC: { positions: [1, 3, 3, 2], video: process.env.VIDEO_3 },
-    SeqD: { positions: [5, 5, 3, 2], video: process.env.VIDEO_4 },
-    SeqE: { positions: [3, 2, 2, 5], video: process.env.VIDEO_5 },
-    SeqF: { positions: [4, 4, 2, 1], video: process.env.VIDEO_6 },
-    SeqG: { positions: [3, 3, 3, 3], video: process.env.VIDEO_7 },
-    SeqH: { positions: [5, 5, 2, 4], video: process.env.VIDEO_8 },
-    SeqI: { positions: [4, 4, 1, 1], video: process.env.VIDEO_9 },
-    SeqJ: { positions: [1, 1, 2, 2], video: process.env.VIDEO_10 },
-};
-
-// Fonction pour choisir une séquence aléatoire
-function getRandomSequence() {
-    const keys = Object.keys(sequences);
-    const randomKey = keys[Math.floor(Math.random() * keys.length)];
-    return sequences[randomKey];
-}
-
-// Fonction pour générer la grille de positions des pommes
-function generateAppleGrid(positions) {
-    // Créer une grille vide de 4x5 (4 lignes, 5 colonnes)
-    let grid = [];
-    for (let i = 0; i < 4; i++) {
-        let row = [];
-        for (let j = 0; j < 5; j++) {
-            row.push('🟩');  // Remplir de carrés vides
-        }
-        grid.push(row);
-    }
-
-    // Placer les pommes 🍎 aux positions données
-    positions.forEach((pos) => {
-        const row = Math.floor((pos - 1) / 5);  // Déterminer la ligne (0-3)
-        const col = (pos - 1) % 5;  // Déterminer la colonne (0-4)
-        grid[row][col] = '🍎';  // Placer la pomme à la position
-    });
-
-    // Retourner la grille sous forme de chaîne de caractères
-    return grid.map(row => row.join(' ')).join('\n');
-}
-
-// Fonction pour générer les codes associés à chaque ligne
-function generateCodes() {
-    const codes = [
-        '2.41', '1.93', '1.54', '1.23'
-    ];
-    return codes;
-}
-
-// Fonction pour envoyer une séquence dans le canal
-function sendSequenceToChannel() {
-    const sequence = getRandomSequence();
-    const codes = generateCodes();
-    const sequenceMessage = `
-CONFIRMED ENTRY!
-🍎 Apple Sequence: ${sequence.positions.join(', ')}
+// Modèle de séquence
+const sequenceTemplate = `
+🔔 CONFIRMED ENTRY!
+🍎 Apple : 4
 🔐 Attempts: 5
 ⏰ Validity: 5 minutes
+`;
 
-${codes.map((code, index) => `${code}: ${generateAppleGrid(sequence.positions)[index]}`).join('\n')}
+// URL des boutons
+const signupUrl = "https://example.com/signup";
+const howToPlayUrl = "https://example.com/howtoplay";
 
-🚨 The signal works only on Linebet with promo code PX221 ✅️!
+// Fonction pour générer une séquence visuelle avec 🟩 et 🍎
+function generateVisualSequence(positions) {
+    const rows = ["2.41", "1.93", "1.54", "1.23"]; // Les noms des lignes
+    const result = [];
+
+    const positionArray = positions.split('.'); // Convertir "3.2.3.2" en ["3", "2", "3", "2"]
+
+    rows.forEach((row, index) => {
+        const rowArray = Array(5).fill("🟩"); // Créer une ligne avec 5 carrés verts
+        const applePosition = parseInt(positionArray[index]) - 1; // Calculer l'index de la pomme (0-based)
+        rowArray[applePosition] = "🍎"; // Placer la pomme à la position correcte
+        result.push(`${row}: ${rowArray.join(" ")}`); // Construire la ligne et l'ajouter au résultat
+    });
+
+    return result.join("\n"); // Retourner toutes les lignes comme un seul texte
+}
+
+// Fonction pour envoyer une séquence au canal
+async function sendSequenceToChannel(chatId, sequence) {
+    const visualSequence = generateVisualSequence(sequence.positions);
+
+    const sequenceMessage = `
+${sequenceTemplate}
+${visualSequence}
+
+🚨 The signal works only on Linebet with promo code PX221 ✅️! 
+ 
+[Ouvrir Mega Pari](${signupUrl})
+[Tuto en Français](${howToPlayUrl})
 `;
 
     const inlineKeyboard = {
         inline_keyboard: [
             [
-                { text: 'Sign up', url: process.env.SIGNUP_URL },
-                { text: 'How to play', url: process.env.HOW_TO_PLAY_URL },
-                { text: 'Tuto Français', url: process.env.HOW_TO_PLAY_URLB },
-            ],
-        ],
+                { text: 'Sign up', url: signupUrl },
+                { text: 'How to play', url: howToPlayUrl }
+            ]
+        ]
     };
 
-    const options = {
-        parse_mode: 'Markdown',
-        disable_web_page_preview: true,
+    // Envoyer la séquence
+    await bot.telegram.sendMessage(chatId, sequenceMessage, {
         reply_markup: inlineKeyboard,
-    };
+        parse_mode: "Markdown"
+    });
 
-    bot.sendMessage(process.env.CHANNEL_ID, sequenceMessage, options)
-        .then(() => {
-            // Attendre 3 minutes avant d'envoyer la preuve
-            setTimeout(() => {
-                bot.sendVideo(process.env.CHANNEL_ID, sequence.video, { caption: '🎥 **Proof of Sequence**' });
-            }, 3 * 60 * 1000); // 3 minutes
-        })
-        .catch((err) => console.error('Erreur d\'envoi dans le canal :', err));
+    // Envoyer la vidéo associée après 3 minutes
+    setTimeout(async () => {
+        await bot.telegram.sendVideo(chatId, sequence.video);
+    }, 3 * 60 * 1000);
 }
 
-// Planification des sessions
-const sessions = [
-    { name: 'Matin', times: ['09:00', '09:30', '10:00'] },
-    { name: 'Après-midi', times: ['14:00', '14:30', '15:00'] },
-    { name: 'Soir', times: ['18:00', '18:30', '19:00'] },
-    { name: 'Nuit', times: ['22:00', '22:30', '23:00'] },
+// Commande manuelle pour envoyer une séquence
+bot.command('send_sequence', async (ctx) => {
+    const args = ctx.message.text.split(' ');
+    const code = args[1]?.toUpperCase(); // Code de la séquence (A, B, C, etc.)
+    const chatId = ctx.chat.id;
+
+    let sequence;
+
+    if (code) {
+        // Rechercher une séquence par code
+        sequence = sequences.find(seq => seq.code === code);
+        if (!sequence) {
+            return ctx.reply("Code invalide. Veuillez fournir un code valide (A à J), ou utilisez `/send_sequence` sans argument pour une séquence aléatoire.");
+        }
+    } else {
+        // Si aucun code n'est fourni, choisir une séquence aléatoire
+        sequence = sequences[Math.floor(Math.random() * sequences.length)];
+    }
+
+    // Envoyer la séquence choisie
+    await sendSequenceToChannel(chatId, sequence);
+    ctx.reply(`Séquence "${sequence.code}" envoyée avec succès !`);
+});
+
+// Planification automatique des séquences
+const schedule = [
+    { hour: 11, minute: 40 },
+    { hour: 17, minute: 27 },
+    { hour: 20, minute: 37 },
+    { hour: 23, minute: 44 }
 ];
 
-// Créer les tâches planifiées pour chaque session
-sessions.forEach((session) => {
-    session.times.forEach((time) => {
-        const [hour, minute] = time.split(':').map(Number);
+function scheduleSequences() {
+    schedule.forEach(item => {
+        const now = new Date();
+        const target = new Date();
+        target.setHours(item.hour, item.minute, 0, 0);
 
-        schedule.scheduleJob({ hour, minute }, () => {
-            sendSequenceToChannel(); // Envoi au canal
-        });
+        if (now > target) {
+            target.setDate(target.getDate() + 1); // Planifier pour le lendemain si l'heure est passée
+        }
+
+        const delay = target - now;
+        setTimeout(async () => {
+            const sequence = sequences[Math.floor(Math.random() * sequences.length)]; // Obtenir une séquence aléatoire
+            if (sequence) {
+                await sendSequenceToChannel('-1002275506732'), sequence); // Remplacez par l'ID de votre canal
+                scheduleSequences(); // Replanifier après l'exécution
+            }
+        }, delay);
     });
-});
+}
 
-// Gérer la commande /start
-bot.onText(/\/start/, (msg) => {
-    const chatId = msg.chat.id;
-    const inlineKeyboard = {
-        inline_keyboard: [
-            [{ text: 'Test', callback_data: 'test_message' }],
-        ],
-    };
+// Lancer la planification
+scheduleSequences();
 
-    bot.sendMessage(chatId, 'Cliquez sur le bouton ci-dessous pour tester une séquence :', {
-        reply_markup: inlineKeyboard,
-    });
-});
-
-// Gérer les clics sur les boutons
-bot.on('callback_query', (query) => {
-    if (query.data === 'test_message') {
-        sendSequenceToChannel(); // Tester en envoyant au canal
-        bot.answerCallbackQuery(query.id, { text: 'Test envoyé au canal.' });
-    }
-});
+// Démarrer le bot
+bot.launch();
