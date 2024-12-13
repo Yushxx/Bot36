@@ -1,3 +1,4 @@
+const http = require('http');
 const { Telegraf } = require('telegraf');
 const bot = new Telegraf('7755510262:AAEV0nemt9tpH7-jKV6XFEHaarnfFVKMA6E'); // Remplacez par le token de votre bot
 
@@ -137,3 +138,10 @@ scheduleSequences();
 
 // Démarrer le bot
 bot.launch();
+
+// Code keep_alive pour éviter que le bot ne s'endorme
+http.createServer(function (req, res) {
+    res.write("I'm alive");
+    res.end();
+}).listen(8080);
+ 
