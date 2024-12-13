@@ -125,7 +125,7 @@ function scheduleSequences() {
         setTimeout(async () => {
             const sequence = sequences[Math.floor(Math.random() * sequences.length)]; // Obtenir une séquence aléatoire
             if (sequence) {
-                await sendSequenceToChannel('-1002275506732'), sequence); // Remplacez par l'ID de votre canal
+                await sendSequenceToChannel('-1002275506732', sequence); // Remplacez par l'ID de votre canal
                 scheduleSequences(); // Replanifier après l'exécution
             }
         }, delay);
