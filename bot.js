@@ -3,7 +3,7 @@ const { Telegraf } = require('telegraf');
 const cron = require('node-cron');
 
 // Token du bot Telegram
-const BOT_TOKEN = '7755510262:AAEV0nemt9tpH7-jKV6XFEHaarnfFVKMA6E'; // Remplacez par votre token
+const BOT_TOKEN = '8175272076:AAEwt3kmxfStzvVgLTOPoUU4rIpOFV8shvc'; // Remplacez par votre token
 
 const bot = new Telegraf(BOT_TOKEN);
 
@@ -116,7 +116,9 @@ bot.command('send_sequence', async (ctx) => {
 
     // Envoyer la séquence choisie
     await sendSequenceToChannel(chatId, sequence);
-    ctx.reply(`Séquence "${sequence.code}" envoyée avec succès !`);
+
+    // Ne pas envoyer de message de notification dans le chat du bot
+    // ctx.reply(`Séquence "${sequence.code}" envoyée avec succès !`);
 });
 
 // Planification automatique des séquences avec node-cron
