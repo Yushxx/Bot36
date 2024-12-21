@@ -1,20 +1,19 @@
 {
-  "name": "telegram-sequence-bot",
+  "name": "telegram-bot",
   "version": "1.0.0",
-  "description": "Bot Telegram pour envoyer des séquences personnalisées avec des vidéos.",
+  "description": "Bot Telegram pour envoyer des séquences avec des vidéos et générer des messages automatiques.",
   "main": "bot.js",
   "scripts": {
     "start": "node bot.js"
   },
-  "keywords": [
-    "telegram",
-    "bot",
-    "telegraf",
-    "sequence"
-  ],
-  "author": "Fadel",
-  "license": "MIT",
   "dependencies": {
-    "telegraf": "^4.12.3"
-  }
+    "telegraf": "^4.8.0",
+    "node-cron": "^3.0.0",
+    "http": "0.0.1"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "author": "Votre Nom",
+  "license": "MIT"
 }
