@@ -8,8 +8,7 @@
   },
   "dependencies": {
     "telegraf": "^4.8.0",
-    "node-cron": "^3.0.0",
-    "http": "0.0.1"
+    "node-cron": "^3.0.0"
   },
   "engines": {
     "node": ">=14.0.0"
