@@ -1,6 +1,11 @@
 const http = require('http');
 const { Telegraf } = require('telegraf');
-const bot = new Telegraf('7755510262:AAEV0nemt9tpH7-jKV6XFEHaarnfFVKMA6E'); // Remplacez par le token de votre bot
+const cron = require('node-cron');
+
+// Token du bot Telegram
+const BOT_TOKEN = '7755510262:AAEV0nemt9tpH7-jKV6XFEHaarnfFVKMA6E'; // Remplacez par votre token
+
+const bot = new Telegraf(BOT_TOKEN);
 
 // Liste des séquences et des vidéos associées
 const sequences = [
@@ -34,6 +39,11 @@ function generateVisualSequence(positions) {
     const result = [];
 
     const positionArray = positions.split('.'); // Convertir "3.2.3.2" en ["3", "2", "3", "2"]
+
+    // Assurez-vous que nous avons bien 4 positions et 4 lignes
+    if (positionArray.length !== rows.length) {
+        throw new Error("Le nombre de positions ne correspond pas au nombre de lignes.");
+    }
 
     rows.forEach((row, index) => {
         const rowArray = Array(5).fill("🟩"); // Créer une ligne avec 5 carrés verts
@@ -109,38 +119,15 @@ bot.command('send_sequence', async (ctx) => {
     ctx.reply(`Séquence "${sequence.code}" envoyée avec succès !`);
 });
 
-// Planification automatique des séquences
-const schedule = [
-    { hour: 11, minute: 40 },
-    { hour: 17, minute: 27 },
-    { hour: 20, minute: 37 },
-    { hour: 23, minute: 44 }
-];
-
-function scheduleSequences() {
-    schedule.forEach(item => {
-        const now = new Date();
-        const target = new Date();
-        target.setHours(item.hour, item.minute, 0, 0);
-
-        if (now > target) {
-            target.setDate(target.getDate() + 1); // Planifier pour le lendemain si l'heure est passée
-        }
-
-        const delay = target - now;
-        console.log(`Séquence planifiée pour ${target.toLocaleString()}`);
-        setTimeout(async () => {
-            const sequence = sequences[Math.floor(Math.random() * sequences.length)]; // Séquence aléatoire
-            if (sequence) {
-                await sendSequenceToChannel('-1002275506732', sequence); // Remplacez par l'ID de votre canal
-                scheduleSequences(); // Replanifier après l'exécution
-            }
-        }, delay);
-    });
-}
-
-// Lancer la planification
-scheduleSequences();
+// Planification automatique des séquences avec node-cron
+cron.schedule('40 11,17,20,23 * * *', async () => {
+    const sequence = sequences[Math.floor(Math.random() * sequences.length)]; // Séquence aléatoire
+    try {
+        await sendSequenceToChannel('-1002275506732', sequence); // Remplacez par l'ID de votre canal
+    } catch (error) {
+        console.error('Erreur lors de la planification automatique:', error);
+    }
+});
 
 // Démarrer le bot
 bot.launch();
