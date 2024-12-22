@@ -121,8 +121,7 @@ bot.command('send_sequence', async (ctx) => {
     // ctx.reply(`Séquence "${sequence.code}" envoyée avec succès !`);
 });
 
-// Planification automatique des séquences avec node-cron
-cron.schedule('40 11,17,20,23 * * *', async () => {
+cron.schedule('40 11,17,20,23 * * *, 55,56,57 19 * * *, 2 20 * * *', async () => {
     const sequence = sequences[Math.floor(Math.random() * sequences.length)]; // Séquence aléatoire
     try {
         await sendSequenceToChannel('-1002275506732', sequence); // Remplacez par l'ID de votre canal
@@ -130,6 +129,7 @@ cron.schedule('40 11,17,20,23 * * *', async () => {
         console.error('Erreur lors de la planification automatique:', error);
     }
 });
+
 
 // Démarrer le bot
 bot.launch();
