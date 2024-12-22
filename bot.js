@@ -119,7 +119,6 @@ bot.command('send_sequence', async (ctx) => {
 
     // Ne pas envoyer de message de notification dans le chat du bot
     // ctx.reply(`Séquence "${sequence.code}" envoyée avec succès !`);
-});
 
 cron.schedule('40 11,17,20,23 * * *, 55,56,57 19 * * *, 2 20 * * *', async () => {
     const sequence = sequences[Math.floor(Math.random() * sequences.length)]; // Séquence aléatoire
