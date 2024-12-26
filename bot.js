@@ -21,8 +21,8 @@ const sequences = [
 ];
 
 // URL des boutons
-const signupUrl = "https://example.com/signup";
-const howToPlayUrl = "https://example.com/howtoplay";
+const signupUrl = "https://bit.ly/3v6rgFc";
+const howToPlayUrl = "https://t.me/c/2035790146/11014";
 
 // Fonction pour générer une séquence visuelle
 function generateVisualSequence(positions) {
@@ -70,8 +70,8 @@ ${visualSequence}
         const inlineKeyboard = {
             inline_keyboard: [
                 [
-                    { text: 'Sign up', url: signupUrl },
-                    { text: 'How to play', url: howToPlayUrl }
+                    { text: 'Register', url: signupUrl },
+                    { text: 'Comment jouer', url: howToPlayUrl }
                 ]
             ]
         };
@@ -97,7 +97,7 @@ bot.command('test_sequence', async (ctx) => {
     try {
         const args = ctx.message.text.split(' ');
         const code = args[1]?.toUpperCase();
-        const channelId = '-1002275506732'; // Remplacez par l'ID de votre canal
+        const channelId = '-1002035790146'; // Remplacez par l'ID de votre canal
 
         let sequence;
 
@@ -121,7 +121,7 @@ bot.command('test_sequence', async (ctx) => {
 // Planification automatique des séquences avec node-cron
 cron.schedule('40 11,17,20,23 * * *', async () => {
     const sequence = sequences[Math.floor(Math.random() * sequences.length)];
-    const channelId = '-1002275506732'; // Remplacez par l'ID de votre canal
+    const channelId = '-1002035790146'; // Remplacez par l'ID de votre canal
 
     try {
         await sendSequenceToChannel(channelId, sequence);
